@@ -22,34 +22,24 @@ async function removerBanco(idElemento){
     });    
 }
 
-async function atualizarTodo(elemento){
-    var elementoAtualizar = document.querySelector("#"+elemento);
-    var descricao = elementoAtualizar.querySelector(".valor-descricao");
-    console.log(descricao.value);
-    await atualizarBanco(elemento.substring(1,elemento.length),descricao.value);
-}
+function atualizarTodo(rowid) {
+    const id = rowid.replace('_', '');
+    const row = document.getElementById(rowid);
+    const descricao = row.querySelector('.valor-descricao').value;
 
-async function atualizarBanco(idElemento, descricao){
-    await fetch('http://localhost:8080/update.php', {
+    fetch('update.php', {
         method: 'PUT',
         headers: {
-            'Content-type': 'application/json; charset=UTF-8',
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            "id":idElemento,
-            "descricao":descricao
-        })
+        body: JSON.stringify({ id: id, descricao: descricao })
     })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Tarefa atualizada com sucesso!');
+        } else {
+            alert('Erro ao atualizar: ' + (data.error || ''));
         }
-        console.log(response.json());
-    })
-    .then((data) => {
-        console.log('Data fetched:', data);
-    })
-    .catch((error) => {
-        console.error('Fetch error:', error);
-    });  
+    });
 }
